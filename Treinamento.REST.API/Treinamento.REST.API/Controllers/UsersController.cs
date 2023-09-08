@@ -8,12 +8,11 @@ using Treinamento.REST.Domain.Interfaces.Services;
 namespace Treinamento.REST.API.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/users")]
     public class UsersController : ControllerBase
     {
         private readonly ILogger<UsersController> _logger;
         private readonly IUserService _service;
-
 
         public UsersController(ILogger<UsersController> logger, IUserService service)
         {
@@ -21,7 +20,7 @@ namespace Treinamento.REST.API.Controllers
             _service = service;
         }
 
-        [HttpGet("get")]
+        [HttpGet]
         [Authorize]
         public IActionResult GetUsers()
         {
@@ -39,7 +38,7 @@ namespace Treinamento.REST.API.Controllers
             return StatusCode(StatusCodes.Status200OK, users);
         }
 
-        [HttpGet("get/id")]
+        [HttpGet("{id}")]
         [Authorize]
         public IActionResult GetUserById([Required] int id)
         {
@@ -53,7 +52,7 @@ namespace Treinamento.REST.API.Controllers
             return Ok(user);
         }
 
-        [HttpPost("add")]
+        [HttpPost]
         [Authorize]
         public IActionResult AddUser([FromBody] User user)
         {
@@ -67,7 +66,7 @@ namespace Treinamento.REST.API.Controllers
             return StatusCode(StatusCodes.Status201Created, "User added successfully.");
         }
 
-        [HttpPut("update")]
+        [HttpPut]
         [Authorize]
         public IActionResult UpdateUser([FromBody] User user)
         {
@@ -81,7 +80,7 @@ namespace Treinamento.REST.API.Controllers
             return Ok("User updated successfully.");
         }
 
-        [HttpPut("update/roles")]
+        [HttpPut("{id}/roles")]
         [Authorize]
         public IActionResult UpdateUserRoles([Required] int id, [Required] Roles role)
         {
@@ -95,7 +94,7 @@ namespace Treinamento.REST.API.Controllers
             return Ok("User's role updated successfully.");
         }
 
-        [HttpDelete("delete")]
+        [HttpDelete("{id}")]
         [Authorize]
         public IActionResult DeleteUser([Required] int id)
         {

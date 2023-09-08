@@ -7,7 +7,7 @@ using Treinamento.REST.Domain.Interfaces.Services;
 namespace Treinamento.REST.API.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/authentications")]
     public class AuthenticateController : ControllerBase
     {
         private readonly ILogger<UsersController> _logger;
@@ -20,7 +20,7 @@ namespace Treinamento.REST.API.Controllers
             _service = service;
         }
 
-        [HttpPost]
+        [HttpPost("login")]
         public IActionResult Login([Required] string username, [Required] string password)
         {
             var auth = _service.VerifyUser(username, password);
