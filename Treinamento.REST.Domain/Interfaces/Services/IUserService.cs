@@ -14,13 +14,15 @@ namespace Treinamento.REST.Domain.Interfaces.Services
 
         User GetUserById(int id);
 
-        bool AddUser(User user);
+        User AddUser(UserInput userInput);
 
-        bool UpdateUser(User user);
+        User UpdateUser(int id, UserInput userInput);
 
         bool DeleteUserById(int userId);
 
-        bool UpdateUserRole(int userId, Roles role);
+        User UpdateUserRole(int userId, Roles role);
+
+        User UpdateUserStatus(int userId, Status status);
 
         Authentication VerifyUser(string username, string password);
     }

@@ -1,0 +1,20 @@
+CREATE DATABASE rest;
+
+USE rest;
+
+DROP TABLE Users;
+
+CREATE TABLE Users
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Username NVARCHAR(255) NOT NULL,
+    Email NVARCHAR(255) NOT NULL,
+    Password NVARCHAR(255) NOT NULL,
+    LastUpdate DATETIME NOT NULL,
+    Role INT NOT NULL DEFAULT 0,
+    Active int NOT NULL DEFAULT 1
+);
+
+SELECT * FROM Users;
+
+

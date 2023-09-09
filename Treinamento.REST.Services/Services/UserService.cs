@@ -33,7 +33,7 @@ namespace Treinamento.REST.Services.Services
 
             foreach (var user in users)
             {
-                user.PasswordHash = _encryptorService.Decrypt(user.PasswordHash);
+                user.Password = _encryptorService.Decrypt(user.Password);
             }
 
             return users;
@@ -45,22 +45,24 @@ namespace Treinamento.REST.Services.Services
 
             if (user != null)
             {
-            user.PasswordHash = _encryptorService.Decrypt(user.PasswordHash);
+                user.Password = _encryptorService.Decrypt(user.Password);
             }
 
             return user;
         }
 
-        public bool AddUser(User user)
+        public User AddUser(UserInput userInput)
         {
-            user.PasswordHash = _encryptorService.Encrypt(user.PasswordHash);
+            var user = User.Map(userInput);
+            user.Password = _encryptorService.Encrypt(user.Password);
 
             return _userRepository.AddUser(user);
         }
 
-        public bool UpdateUser(User user)
+        public User UpdateUser(int id, UserInput userInput)
         {
-            user.PasswordHash = _encryptorService.Encrypt(user.PasswordHash);
+            var user = User.Map(id, userInput);
+            user.Password = _encryptorService.Encrypt(user.Password);
 
             return _userRepository.UpdateUser(user);
         }
@@ -70,20 +72,33 @@ namespace Treinamento.REST.Services.Services
             return _userRepository.DeleteUserById(userId);
         }
 
-        public bool UpdateUserRole(int userId, Roles role)
+        public User UpdateUserRole(int userId, Roles role)
         {
-            return _userRepository.UpdateUserRole(userId, role);
+            var userUpdated = _userRepository.UpdateUserRole(userId, role);
+
+            userUpdated.Password = _encryptorService.Decrypt(userUpdated.Password);
+
+            return userUpdated;
+        }
+
+        public User UpdateUserStatus(int userId, Status status)
+        {
+            var userUpdated = _userRepository.UpdateUserStatus(userId, status);
+
+            userUpdated.Password = _encryptorService.Decrypt(userUpdated.Password);
+
+            return userUpdated;
         }
 
         public Authentication VerifyUser(string username, string password)
         {
             var auth = _userRepository.VerifyUser(username);
-            var user = _userRepository.GetUserById(auth == null ? 0 : auth.UserID);
+            var user = _userRepository.GetUserById(auth == null ? 0 : auth.Id);
 
 
             if (user != null)
             {
-                var passwordDecrypted = _encryptorService.Decrypt(user.PasswordHash);
+                var passwordDecrypted = _encryptorService.Decrypt(user.Password);
 
                 if (passwordDecrypted != password)
                     return null;
