@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.Net;
+using Treinamento.REST.API.Responses;
 using Treinamento.REST.Domain.Entities;
 using Treinamento.REST.Domain.Enums;
 using Treinamento.REST.Domain.Interfaces.Services;
@@ -28,14 +30,15 @@ namespace Treinamento.REST.API.Controllers
 
             if (users == null)
             {
-                return BadRequest("Internal Server Error.");
-            }
-            else if (users.Count() == 0)
-            {
-                return StatusCode(StatusCodes.Status204NoContent, "No Users Found.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while communicating with the database.");
             }
 
-            return StatusCode(StatusCodes.Status200OK, users);
+            return StatusCode(StatusCodes.Status200OK, new GetResponse<User>()
+            {
+                Success = true,
+                Message = $"{users.Count()} users found",
+                Users = users
+            });
         }
 
         [HttpGet("{id}")]
@@ -46,52 +49,99 @@ namespace Treinamento.REST.API.Controllers
 
             if (user == null)
             {
-                return NotFound("No User Found with this ID.");
+                return StatusCode(StatusCodes.Status200OK, new GetByIdResponse<User>()
+                {
+                    Success = false,
+                    Message = $"No user with id '{id}' was found",
+                    User = user
+                });
             }
 
-            return Ok(user);
+            return StatusCode(StatusCodes.Status200OK, new GetByIdResponse<User>()
+            {
+                Success = true,
+                Message = $"A user with id '{id}' was found",
+                User = user
+            });
         }
 
         [HttpPost]
-        [Authorize]
-        public IActionResult AddUser([FromBody] User user)
+        public IActionResult AddUser([FromBody] UserInput user)
         {
-            var result = _service.AddUser(user);
+            var newUser = _service.AddUser(user);
 
-            if (!result)
+            if (newUser == null)
             {
-                return BadRequest("Unable to Add user. Check the data entered and try again..");
+                return BadRequest("Unable to Add user. Check the data entered and try again.");
             }
 
-            return StatusCode(StatusCodes.Status201Created, "User added successfully.");
+            return StatusCode(StatusCodes.Status201Created, new PostResponse<User>()
+            {
+                Success = true,
+                Message = "User successfully created.",
+                URI = @$"{Request.Scheme}://{Request.Host.Value}/api/users/{newUser.Id}",
+                CreatedUser = newUser
+            }); 
         }
 
         [HttpPut]
         [Authorize]
-        public IActionResult UpdateUser([FromBody] User user)
+        public IActionResult UpdateUser([Required]int id, [FromBody] UserInput user)
         {
-            var result = _service.UpdateUser(user);
+            var userUpdated = _service.UpdateUser(id, user);
 
-            if (!result)
+            if (userUpdated == null)
             {
                 return BadRequest("Unable to Update user. Check the data entered and try again.");
             }
 
-            return Ok("User updated successfully.");
+            return StatusCode(StatusCodes.Status200OK, new PutResponse<User>()
+            {
+                Success = true,
+                Message = "User updated successfully.",
+                URI = @$"{Request.Scheme}://{Request.Host.Value}/api/users/{id}",
+                UpdatedUser = userUpdated
+            }); 
         }
 
         [HttpPut("{id}/roles")]
         [Authorize]
         public IActionResult UpdateUserRoles([Required] int id, [Required] Roles role)
         {
-            var result = _service.UpdateUserRole(id, role);
+            var userUpdated = _service.UpdateUserRole(id, role);
 
-            if (!result)
+            if (userUpdated == null)
             {
                 return BadRequest("Unable to Update user's role. Check the data entered and try again.");
             }
 
-            return Ok("User's role updated successfully.");
+            return StatusCode(StatusCodes.Status200OK, new PutResponse<User>()
+            {
+                Success = true,
+                Message = "User's role updated successfully.",
+                URI = @$"{Request.Scheme}://{Request.Host.Value}/api/users/{id}",
+                UpdatedUser = userUpdated
+            });
+        }
+
+        [HttpPut("{id}/status")]
+        [Authorize]
+        public IActionResult UpdateUserStatus([Required] int id, [Required] Status status)
+        {
+            var userUpdated = _service.UpdateUserStatus(id, status);
+
+            if (userUpdated == null)
+            {
+                return BadRequest("Unable to Update user's status. Check the data entered and try again.");
+            }
+
+            return StatusCode(StatusCodes.Status200OK, new PutResponse<User>()
+            {
+                Success = true,
+                Message = "User's status updated successfully.",
+                URI = @$"{Request.Scheme}://{Request.Host.Value}/api/users/{id}",
+                UpdatedUser = userUpdated
+            });
         }
 
         [HttpDelete("{id}")]
@@ -102,10 +152,18 @@ namespace Treinamento.REST.API.Controllers
 
             if (!result)
             {
-                return BadRequest("Unable to Delete user. Check the entered ID and try again..");
+                return StatusCode(StatusCodes.Status404NotFound, new GetResponse<User>()
+                {
+                    Success = false,
+                    Message = $"No User with id '{id}' was found"
+                });
             }
 
-            return Ok("User's role updated successfully.");
+            return StatusCode(StatusCodes.Status200OK, new DeleteResponse()
+            {
+                Success = true,
+                Message = $"User with id '{id}' was deleted"
+            });
         }
 
     }

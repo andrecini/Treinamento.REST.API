@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,11 +8,11 @@ using Treinamento.REST.Domain.Enums;
 
 namespace Treinamento.REST.Domain.Entities
 {
-    public class Authentication
+    [DisplayName("Users")]
+    public class UserInput
     {
-        public int Id { get; set; }
-        public string UserName { get; set; }
-        public Roles Role { get; set; }
-        public TokenModel Token { get; set; }
+        public string Username { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
     }
 }

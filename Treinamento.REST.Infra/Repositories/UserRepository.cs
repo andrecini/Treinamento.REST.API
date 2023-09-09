@@ -37,78 +37,100 @@ namespace Treinamento.REST.Data.Repositories
 
         public User GetUserById(int id)
         {
-            var sql = $@"SELECT * FROM dbo.Users WHERE UserID = @Id;";
+            var sql = $@"SELECT * FROM dbo.Users WHERE Id = @Id;";
 
             var user = _dbConnection.QueryFirstOrDefault<User>(sql, new { Id = id });
 
             return user;
         }
 
-        public bool AddUser(User user)
+        public User AddUser(User user)
         {
             var sql = $@"INSERT INTO dbo.Users
                          (
-                            UserName,
+                            Username,
                             Email,
-                            PasswordHash,
-                            RegistrationDate
+                            Password,
+                            LastUpdate
                          )
+                         OUTPUT INSERTED.Id
                          VALUES
                          (
-                            @UserName,
+                            @Username,
                             @Email,
-                            @PasswordHash,
-                            @RegistrationDate
+                            @Password,
+                            @LastUpdate
                          );";
 
-            var qtdLinhasAfetadas = _dbConnection.Execute(sql, user);
+            var newId = _dbConnection.QuerySingle<int>(sql, user);
+            
+            var newUser = GetUserById(newId);
 
-            return qtdLinhasAfetadas > 0;
+            return newUser;
         }
 
-        public bool UpdateUser(User user)
+        public User UpdateUser(User user)
         {
             var sql = $@"UPDATE dbo.Users
-                         SET
-                            UserName = @UserName,
-                            Email = @Email,
-                            PasswordHash = @PasswordHash,
-                            RegistrationDate = @RegistrationDate
-                         WHERE
-                            UserID = @UserID;";
+                 SET
+                    Username = @Username,
+                    Email = @Email,
+                    Password = @Password,
+                    LastUpdate = @LastUpdate
+                 OUTPUT INSERTED.Id
+                 WHERE
+                    Id = @Id;";
 
-            var qtdLinhasAfetadas = _dbConnection.Execute(sql, user);
+            var Id = _dbConnection.QuerySingle<int>(sql, user);
 
-            return qtdLinhasAfetadas > 0;
+            return GetUserById(Id);
         }
 
-        public bool DeleteUserById(int userId)
+
+        public bool DeleteUserById(int Id)
         {
-            var sql = "DELETE FROM dbo.Users WHERE UserID = @UserID";
+            var sql = "DELETE FROM dbo.Users WHERE Id = @Id";
 
-            var qtdLinhasAfetadas = _dbConnection.Execute(sql, new { UserID = userId });
+            var qtdLinhasAfetadas = _dbConnection.Execute(sql, new { Id = Id });
 
             return qtdLinhasAfetadas > 0;
         }
 
-        public bool UpdateUserRole(int userId, Roles role)
+        public User UpdateUserRole(int Id, Roles role)
         {
             var sql = $@"UPDATE dbo.Users
                          SET
                             Role = @Role
                          WHERE
-                            UserID = @UserID;";
+                            Id = @Id;";
 
-            var qtdLinhasAfetadas = _dbConnection.Execute(sql, new { Role = role, UserID = userId});
+            var qtdLinhasAfetadas = _dbConnection.Execute(sql, new { Role = role, Id = Id});
 
-            return qtdLinhasAfetadas > 0;
+            var userUpdated = GetUserById(Id);
+
+            return userUpdated;
         }
 
-        public Authentication VerifyUser(string username)
+        public User UpdateUserStatus(int Id, Status status)
         {
-            var sql = $@"SELECT * FROM dbo.Users WHERE UserName = @UserName;";
+            var sql = $@"UPDATE dbo.Users
+                         SET
+                            Active = @Status
+                         WHERE
+                            Id = @Id;";
 
-            var auth = _dbConnection.QueryFirstOrDefault<Authentication>(sql, new { UserName = username });
+            var qtdLinhasAfetadas = _dbConnection.Execute(sql, new { Status = status, Id = Id });
+
+            var userUpdated = GetUserById(Id);
+
+            return userUpdated;
+        }
+
+        public Authentication VerifyUser(string Username)
+        {
+            var sql = $@"SELECT * FROM dbo.Users WHERE Username = @Username;";
+
+            var auth = _dbConnection.QueryFirstOrDefault<Authentication>(sql, new { Username = Username });
 
             return auth;
         }
