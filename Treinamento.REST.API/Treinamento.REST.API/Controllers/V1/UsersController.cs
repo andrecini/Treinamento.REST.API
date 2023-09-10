@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using System.ComponentModel.DataAnnotations;
-using System.Net;
 using Treinamento.REST.API.Responses;
 using Treinamento.REST.Domain.Entities;
 using Treinamento.REST.Domain.Enums;
 using Treinamento.REST.Domain.Interfaces.Services;
+using Treinamento.REST.Services.Services;
 
 namespace Treinamento.REST.API.Controllers.V1
 {
@@ -16,11 +17,13 @@ namespace Treinamento.REST.API.Controllers.V1
     {
         private readonly ILogger<UsersController> _logger;
         private readonly IUserService _service;
+        private readonly IMemoryCache _cache;
 
-        public UsersController(ILogger<UsersController> logger, IUserService service)
+        public UsersController(ILogger<UsersController> logger, IUserService service, IMemoryCache cache)
         {
             _logger = logger;
             _service = service;
+            _cache = cache;
         }
 
         /// <summary>
@@ -36,7 +39,8 @@ namespace Treinamento.REST.API.Controllers.V1
             if (page <= 0) return BadRequest("The page value must be greater than 0.");
             if (pageSize < 5) return BadRequest("The page size value must be grater or equal than 0.");
 
-            var users = _service.GetUsers(page, pageSize);
+            var users = CacheHelper.GetOrSet(_cache, $"users_{page}_{pageSize}",
+                () => _service.GetUsers(page, pageSize), TimeSpan.FromMinutes(5));
 
             if (users == null)
             {
@@ -68,7 +72,8 @@ namespace Treinamento.REST.API.Controllers.V1
         [Authorize]
         public IActionResult GetUserById([Required] int id)
         {
-            var user = _service.GetUserById(id);
+            var user = CacheHelper.GetOrSet(_cache, $"users_{id}",
+                () => _service.GetUserById(id), TimeSpan.FromMinutes(5));
 
             if (user == null)
             {
@@ -224,7 +229,8 @@ namespace Treinamento.REST.API.Controllers.V1
         [Authorize]
         public IActionResult DeleteUser([Required] int id)
         {
-            var result = _service.DeleteUserById(id);
+            var result = CacheHelper.GetOrSet(_cache, $"delete_{id}",
+                () => _service.DeleteUserById(id), TimeSpan.FromMinutes(5));
 
             if (!result)
             {
@@ -241,6 +247,5 @@ namespace Treinamento.REST.API.Controllers.V1
                 Message = $"User with id '{id}' was deleted"
             });
         }
-
     }
 }

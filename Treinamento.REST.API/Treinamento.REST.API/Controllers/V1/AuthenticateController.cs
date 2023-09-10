@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using System.ComponentModel.DataAnnotations;
 using Treinamento.REST.API.Responses;
 using Treinamento.REST.Domain.Entities;
 using Treinamento.REST.Domain.Enums;
 using Treinamento.REST.Domain.Interfaces.Services;
+using Treinamento.REST.Services.Services;
 
 namespace Treinamento.REST.API.Controllers.V1
 {
@@ -14,13 +16,14 @@ namespace Treinamento.REST.API.Controllers.V1
     public class AuthenticateController : ControllerBase
     {
         private readonly ILogger<UsersController> _logger;
-
         private readonly IUserService _service;
+        private readonly IMemoryCache _cache;
 
-        public AuthenticateController(ILogger<UsersController> logger, IUserService service)
+        public AuthenticateController(ILogger<UsersController> logger, IUserService service, IMemoryCache cache)
         {
             _logger = logger;
             _service = service;
+            _cache = cache;
         }
 
         /// <summary>
@@ -38,7 +41,8 @@ namespace Treinamento.REST.API.Controllers.V1
         [HttpGet("login")]
         public IActionResult Login([Required] string username, [Required] string password)
         {
-            var auth = _service.VerifyUser(username, password);
+            var auth = CacheHelper.GetOrSet(_cache, $"auth_{username}", 
+                () => _service.VerifyUser(username, password), TimeSpan.FromMinutes(5));
 
             if (auth == null)
             {
@@ -53,7 +57,7 @@ namespace Treinamento.REST.API.Controllers.V1
             return StatusCode(StatusCodes.Status200OK, new GetAuthenticationResponse<Authentication>()
             {
                 Success = true,
-                Message = $"Uauthorized user",
+                Message = $"Authorized user",
                 Auth = auth
             });
         }
