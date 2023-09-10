@@ -12,12 +12,31 @@ using Treinamento.REST.Services.Services;
 using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Treinamento.REST.API.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers()
 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+builder.Services.AddApiVersioning(options =>
+{
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+});
+
+builder.Services.AddVersionedApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
+});
+
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -93,7 +112,15 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        foreach (var description in
+            app.Services.GetRequiredService<IApiVersionDescriptionProvider>().ApiVersionDescriptions)
+        {
+            options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json",
+                description.GroupName.ToUpperInvariant());
+        }
+    });
 }
 
 app.UseHttpsRedirection();

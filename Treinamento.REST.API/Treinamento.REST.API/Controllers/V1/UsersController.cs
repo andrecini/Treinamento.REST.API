@@ -7,10 +7,11 @@ using Treinamento.REST.Domain.Entities;
 using Treinamento.REST.Domain.Enums;
 using Treinamento.REST.Domain.Interfaces.Services;
 
-namespace Treinamento.REST.API.Controllers
+namespace Treinamento.REST.API.Controllers.V1
 {
     [ApiController]
-    [Route("api/users")]
+    [ApiVersion("1.0")]
+    [Route("v1/users")]
     public class UsersController : ControllerBase
     {
         private readonly ILogger<UsersController> _logger;
@@ -26,7 +27,7 @@ namespace Treinamento.REST.API.Controllers
         [Authorize]
         public IActionResult GetUsers([Required] int page, [Required] int pageSize)
         {
-            if (page <= 0) return BadRequest("The page value must be greater than 0."); 
+            if (page <= 0) return BadRequest("The page value must be greater than 0.");
             if (pageSize < 5) return BadRequest("The page size value must be grater or equal than 0.");
 
             var users = _service.GetUsers(page, pageSize);
@@ -85,14 +86,14 @@ namespace Treinamento.REST.API.Controllers
             {
                 Success = true,
                 Message = "User successfully created.",
-                URI = @$"{Request.Scheme}://{Request.Host.Value}/api/users/{newUser.Id}",
+                URI = @$"{Request.Scheme}://{Request.Host.Value}/v1/users/{newUser.Id}",
                 CreatedUser = newUser
-            }); 
+            });
         }
 
         [HttpPut]
         [Authorize]
-        public IActionResult UpdateUser([Required]int id, [FromBody] UserInput user)
+        public IActionResult UpdateUser([Required] int id, [FromBody] UserInput user)
         {
             var userUpdated = _service.UpdateUser(id, user);
 
@@ -105,9 +106,9 @@ namespace Treinamento.REST.API.Controllers
             {
                 Success = true,
                 Message = "User updated successfully.",
-                URI = @$"{Request.Scheme}://{Request.Host.Value}/api/users/{id}",
+                URI = @$"{Request.Scheme}://{Request.Host.Value}/v1/users/{id}",
                 UpdatedUser = userUpdated
-            }); 
+            });
         }
 
         [HttpPut("{id}/roles")]
@@ -125,7 +126,7 @@ namespace Treinamento.REST.API.Controllers
             {
                 Success = true,
                 Message = "User's role updated successfully.",
-                URI = @$"{Request.Scheme}://{Request.Host.Value}/api/users/{id}",
+                URI = @$"{Request.Scheme}://{Request.Host.Value}/v1/users/{id}",
                 UpdatedUser = userUpdated
             });
         }
@@ -145,7 +146,7 @@ namespace Treinamento.REST.API.Controllers
             {
                 Success = true,
                 Message = "User's status updated successfully.",
-                URI = @$"{Request.Scheme}://{Request.Host.Value}/api/users/{id}",
+                URI = @$"{Request.Scheme}://{Request.Host.Value}/v1/users/{id}",
                 UpdatedUser = userUpdated
             });
         }

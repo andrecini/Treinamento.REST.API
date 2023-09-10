@@ -6,10 +6,11 @@ using Treinamento.REST.Domain.Entities;
 using Treinamento.REST.Domain.Enums;
 using Treinamento.REST.Domain.Interfaces.Services;
 
-namespace Treinamento.REST.API.Controllers
+namespace Treinamento.REST.API.Controllers.V1
 {
     [ApiController]
-    [Route("api/authentications")]
+    [ApiVersion("1.0")]
+    [Route("v1/authentications")]
     public class AuthenticateController : ControllerBase
     {
         private readonly ILogger<UsersController> _logger;
