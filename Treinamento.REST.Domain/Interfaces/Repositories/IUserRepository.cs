@@ -5,9 +5,11 @@ namespace Treinamento.REST.Domain.Interfaces.Repositories
 {
     public interface IUserRepository
     {
-        IEnumerable<User> GetUsers();
+        IEnumerable<User> GetUsers(int skip, int pageSize);
 
         User GetUserById(int id);
+
+        int GetTotalAmountOfUsers();
 
         User AddUser(User user);
 

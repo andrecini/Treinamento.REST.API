@@ -24,9 +24,12 @@ namespace Treinamento.REST.API.Controllers
 
         [HttpGet]
         [Authorize]
-        public IActionResult GetUsers()
+        public IActionResult GetUsers([Required] int page, [Required] int pageSize)
         {
-            var users = _service.GetUsers();
+            if (page <= 0) return BadRequest("The page value must be greater than 0."); 
+            if (pageSize < 5) return BadRequest("The page size value must be grater or equal than 0.");
+
+            var users = _service.GetUsers(page, pageSize);
 
             if (users == null)
             {
@@ -35,6 +38,9 @@ namespace Treinamento.REST.API.Controllers
 
             return StatusCode(StatusCodes.Status200OK, new GetResponse<User>()
             {
+                Page = page,
+                PageSize = pageSize,
+                TotalAmount = _service.GetTotalAmountOfUsers(),
                 Success = true,
                 Message = $"{users.Count()} users found",
                 Users = users

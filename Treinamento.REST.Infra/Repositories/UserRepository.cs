@@ -1,17 +1,11 @@
-﻿using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Treinamento.REST.Domain.Entities;
-using Dapper;
+﻿using Dapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Data;
-using Microsoft.Win32;
-using System.Reflection.Emit;
-using Treinamento.REST.Domain.Interfaces.Repositories;
+using Treinamento.REST.Domain.Entities;
 using Treinamento.REST.Domain.Enums;
+using Treinamento.REST.Domain.Interfaces.Repositories;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Treinamento.REST.Data.Repositories
 {
@@ -24,15 +18,26 @@ namespace Treinamento.REST.Data.Repositories
             _dbConnection = dbConnection;
         }
 
-        public IEnumerable<User> GetUsers()
+        public IEnumerable<User> GetUsers(int skip, int pageSize)
         {
-            var user = new User();
+            var sql = $@"SELECT* FROM dbo.Users
+                         ORDER BY Id
+                         OFFSET @Skip
+                         ROWS
+                         FETCH NEXT @PageSize
+                         ROWS ONLY;";
 
-            var sql = $@"SELECT * FROM dbo.Users;";
-
-            var users = _dbConnection.Query<User>(sql);
+            var users = _dbConnection.Query<User>(sql, new { Skip = skip, PageSize = pageSize});
 
             return users;
+        }
+        public int GetTotalAmountOfUsers()
+        {
+            var sql = $@"SELECT COUNT(*) FROM dbo.Users";
+
+            var total = _dbConnection.QueryFirst<int>(sql);
+
+            return total;
         }
 
         public User GetUserById(int id)

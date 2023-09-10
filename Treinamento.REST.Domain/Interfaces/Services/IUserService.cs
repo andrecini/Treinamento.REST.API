@@ -10,9 +10,11 @@ namespace Treinamento.REST.Domain.Interfaces.Services
 {
     public interface IUserService
     {
-        IEnumerable<User> GetUsers();
+        IEnumerable<User> GetUsers(int skip, int pageSize);
 
         User GetUserById(int id);
+
+        int GetTotalAmountOfUsers();
 
         User AddUser(UserInput userInput);
 

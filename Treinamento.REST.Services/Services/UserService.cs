@@ -27,9 +27,11 @@ namespace Treinamento.REST.Services.Services
             _encryptorService = encryptorService;
         }
 
-        public IEnumerable<User> GetUsers()
+        public IEnumerable<User> GetUsers(int page, int pageSize)
         {
-            var users = _userRepository.GetUsers();
+            page = (page - 1) * pageSize;
+
+            var users = _userRepository.GetUsers(page, pageSize);
 
             foreach (var user in users)
             {
@@ -37,6 +39,11 @@ namespace Treinamento.REST.Services.Services
             }
 
             return users;
+        }
+
+        public int GetTotalAmountOfUsers()
+        {
+            return _userRepository.GetTotalAmountOfUsers();
         }
 
         public User GetUserById(int id)
