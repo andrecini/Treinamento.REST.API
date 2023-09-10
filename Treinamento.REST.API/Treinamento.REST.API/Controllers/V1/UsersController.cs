@@ -55,10 +55,15 @@ namespace Treinamento.REST.API.Controllers.V1
         }
 
         /// <summary>
-        /// Retrives a user by id
+        /// Retrieve a user by their unique ID.
         /// </summary>
-        /// <param name="id">Id of User</param>
-        /// <returns>Returns a users by id.</returns>
+        /// <remarks>
+        /// This endpoint allows you to retrieve a user's information by providing their unique ID.
+        /// </remarks>
+        /// <param name="id">The unique ID of the user to retrieve.</param>
+        /// <returns>Returns the user information based on the provided ID.</returns>
+        /// <response code="200">Returns the user information if found.</response>
+        /// <response code="400">Returns an error message if no user with the specified ID is found.</response>
         [HttpGet("{id}")]
         [Authorize]
         public IActionResult GetUserById([Required] int id)
@@ -67,7 +72,7 @@ namespace Treinamento.REST.API.Controllers.V1
 
             if (user == null)
             {
-                return StatusCode(StatusCodes.Status200OK, new GetByIdResponse<User>()
+                return StatusCode(StatusCodes.Status400BadRequest, new GetByIdResponse<User>()
                 {
                     Success = false,
                     Message = $"No user with id '{id}' was found",
@@ -84,10 +89,15 @@ namespace Treinamento.REST.API.Controllers.V1
         }
 
         /// <summary>
-        /// Adds a new user.
+        /// Create a new user.
         /// </summary>
-        /// <param name="user">Basic information of the user to be added.</param>
-        /// <returns>Returns the result of the user addition.</returns>
+        /// <remarks>
+        /// This endpoint allows you to create a new user by providing their basic information.
+        /// </remarks>
+        /// <param name="user">The basic information of the user to be created.</param>
+        /// <returns>Returns the result of user creation.</returns>
+        /// <response code="201">Returns a successful user creation result.</response>
+        /// <response code="400">Returns an error message if the data provided is invalid.</response>
         [HttpPost]
         public IActionResult AddUser([FromBody] UserInput user)
         {
@@ -108,11 +118,16 @@ namespace Treinamento.REST.API.Controllers.V1
         }
 
         /// <summary>
-        /// Updates an existing user.
+        /// Update an existing user.
         /// </summary>
-        /// <param name="id">ID of the user to be updated.</param>
-        /// <param name="user">Updated user information.</param>
-        /// <returns>Returns the result of the user update.</returns>
+        /// <remarks>
+        /// This endpoint allows you to update an existing user's information by providing their ID and new data.
+        /// </remarks>
+        /// <param name="id">The ID of the user to be updated.</param>
+        /// <param name="user">The updated user information.</param>
+        /// <returns>Returns the result of user update.</returns>
+        /// <response code="200">Returns a successful user update result.</response>
+        /// <response code="400">Returns an error message if the data provided is invalid.</response>
         [HttpPut]
         [Authorize]
         public IActionResult UpdateUser([Required] int id, [FromBody] UserInput user)
@@ -134,11 +149,16 @@ namespace Treinamento.REST.API.Controllers.V1
         }
 
         /// <summary>
-        /// Updates the role of an existing user.
+        /// Update the role of an existing user.
         /// </summary>
-        /// <param name="id">ID of the user whose role will be updated.</param>
-        /// <param name="role">New role for the user.</param>
+        /// <remarks>
+        /// This endpoint allows you to update the role of an existing user by providing their ID and a new role.
+        /// </remarks>
+        /// <param name="id">The ID of the user whose role will be updated.</param>
+        /// <param name="role">The new role for the user.</param>
         /// <returns>Returns the result of the user's role update.</returns>
+        /// <response code="200">Returns a successful user role update result.</response>
+        /// <response code="400">Returns an error message if the data provided is invalid.</response>
         [HttpPut("{id}/roles")]
         [Authorize]
         public IActionResult UpdateUserRoles([Required] int id, [Required] Roles role)
@@ -160,12 +180,16 @@ namespace Treinamento.REST.API.Controllers.V1
         }
 
         /// <summary>
-        /// Updates the status of an existing user.
+        /// Update the status of an existing user.
         /// </summary>
-        /// <param name="id">ID of the user whose status will be updated.</param>
-        /// <param name="status">New status for the user.</param>
+        /// <remarks>
+        /// This endpoint allows you to update the status of an existing user by providing their ID and a new status.
+        /// </remarks>
+        /// <param name="id">The ID of the user whose status will be updated.</param>
+        /// <param name="status">The new status for the user.</param>
         /// <returns>Returns the result of the user's status update.</returns>
-
+        /// <response code="200">Returns a successful user status update result.</response>
+        /// <response code="400">Returns an error message if the data provided is invalid.</response>
         [HttpPut("{id}/status")]
         [Authorize]
         public IActionResult UpdateUserStatus([Required] int id, [Required] Status status)
@@ -187,10 +211,15 @@ namespace Treinamento.REST.API.Controllers.V1
         }
 
         /// <summary>
-        /// Deletes an existing user by their ID.
+        /// Delete an existing user by their ID.
         /// </summary>
-        /// <param name="id">ID of the user to be deleted.</param>
+        /// <remarks>
+        /// This endpoint allows you to delete an existing user by providing their ID. If the user is found and successfully deleted, it returns a success message.
+        /// </remarks>
+        /// <param name="id">The ID of the user to be deleted.</param>
         /// <returns>Returns the result of the user deletion.</returns>
+        /// <response code="200">Returns a success message if the user is deleted.</response>
+        /// <response code="404">Returns an error message if no user with the specified ID is found.</response>
         [HttpDelete("{id}")]
         [Authorize]
         public IActionResult DeleteUser([Required] int id)

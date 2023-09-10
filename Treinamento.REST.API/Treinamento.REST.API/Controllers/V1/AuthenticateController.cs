@@ -24,11 +24,17 @@ namespace Treinamento.REST.API.Controllers.V1
         }
 
         /// <summary>
-        /// Authenticates a user by verifying their username and password.
+        /// Authenticate a user by verifying their username and password.
         /// </summary>
-        /// <param name="username">Username of the user.</param>
-        /// <param name="password">Password of the user.</param>
+        /// <remarks>
+        /// This endpoint allows users to log in by providing their username and password. 
+        /// If the provided credentials are valid, it returns an authentication token.
+        /// </remarks>
+        /// <param name="username">The username of the user.</param>
+        /// <param name="password">The password of the user.</param>
         /// <returns>Returns the authentication result.</returns>
+        /// <response code="200">Returns a successful authentication result.</response>
+        /// <response code="401">Returns an unauthorized error if the credentials are invalid.</response>
         [HttpGet("login")]
         public IActionResult Login([Required] string username, [Required] string password)
         {
