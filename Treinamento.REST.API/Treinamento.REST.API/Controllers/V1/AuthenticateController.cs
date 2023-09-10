@@ -23,6 +23,12 @@ namespace Treinamento.REST.API.Controllers.V1
             _service = service;
         }
 
+        /// <summary>
+        /// Authenticates a user by verifying their username and password.
+        /// </summary>
+        /// <param name="username">Username of the user.</param>
+        /// <param name="password">Password of the user.</param>
+        /// <returns>Returns the authentication result.</returns>
         [HttpGet("login")]
         public IActionResult Login([Required] string username, [Required] string password)
         {

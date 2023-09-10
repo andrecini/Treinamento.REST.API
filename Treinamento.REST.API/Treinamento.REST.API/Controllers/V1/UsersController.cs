@@ -23,6 +23,12 @@ namespace Treinamento.REST.API.Controllers.V1
             _service = service;
         }
 
+        /// <summary>
+        /// Retrieves a list of users.
+        /// </summary>
+        /// <param name="page">Page number, greater than or equal to 1.</param>
+        /// <param name="pageSize">Page size, greater than or equal to 5.</param>
+        /// <returns>Returns a list of users.</returns>
         [HttpGet]
         [Authorize]
         public IActionResult GetUsers([Required] int page, [Required] int pageSize)
@@ -48,6 +54,11 @@ namespace Treinamento.REST.API.Controllers.V1
             });
         }
 
+        /// <summary>
+        /// Retrives a user by id
+        /// </summary>
+        /// <param name="id">Id of User</param>
+        /// <returns>Returns a users by id.</returns>
         [HttpGet("{id}")]
         [Authorize]
         public IActionResult GetUserById([Required] int id)
@@ -72,6 +83,11 @@ namespace Treinamento.REST.API.Controllers.V1
             });
         }
 
+        /// <summary>
+        /// Adds a new user.
+        /// </summary>
+        /// <param name="user">Basic information of the user to be added.</param>
+        /// <returns>Returns the result of the user addition.</returns>
         [HttpPost]
         public IActionResult AddUser([FromBody] UserInput user)
         {
@@ -91,6 +107,12 @@ namespace Treinamento.REST.API.Controllers.V1
             });
         }
 
+        /// <summary>
+        /// Updates an existing user.
+        /// </summary>
+        /// <param name="id">ID of the user to be updated.</param>
+        /// <param name="user">Updated user information.</param>
+        /// <returns>Returns the result of the user update.</returns>
         [HttpPut]
         [Authorize]
         public IActionResult UpdateUser([Required] int id, [FromBody] UserInput user)
@@ -111,6 +133,12 @@ namespace Treinamento.REST.API.Controllers.V1
             });
         }
 
+        /// <summary>
+        /// Updates the role of an existing user.
+        /// </summary>
+        /// <param name="id">ID of the user whose role will be updated.</param>
+        /// <param name="role">New role for the user.</param>
+        /// <returns>Returns the result of the user's role update.</returns>
         [HttpPut("{id}/roles")]
         [Authorize]
         public IActionResult UpdateUserRoles([Required] int id, [Required] Roles role)
@@ -130,6 +158,13 @@ namespace Treinamento.REST.API.Controllers.V1
                 UpdatedUser = userUpdated
             });
         }
+
+        /// <summary>
+        /// Updates the status of an existing user.
+        /// </summary>
+        /// <param name="id">ID of the user whose status will be updated.</param>
+        /// <param name="status">New status for the user.</param>
+        /// <returns>Returns the result of the user's status update.</returns>
 
         [HttpPut("{id}/status")]
         [Authorize]
@@ -151,6 +186,11 @@ namespace Treinamento.REST.API.Controllers.V1
             });
         }
 
+        /// <summary>
+        /// Deletes an existing user by their ID.
+        /// </summary>
+        /// <param name="id">ID of the user to be deleted.</param>
+        /// <returns>Returns the result of the user deletion.</returns>
         [HttpDelete("{id}")]
         [Authorize]
         public IActionResult DeleteUser([Required] int id)
